@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using OrderApi.Models;
+
 using System;
+using System.Linq.Expressions;
 
 namespace OrderApi.Data
 {
@@ -14,8 +16,13 @@ namespace OrderApi.Data
         {
             db = context;
         }
-
-        Order IRepository<Order>.Add(Order entity)
+        public IEnumerable<Order> Search(Expression<Func<Order, bool>> predicate) => db.Orders.Where(predicate);
+        public void Edit(Order entity)
+        {
+            db.Orders.Where(x => x.Id == entity.Id).ForEachAsync(x => x = entity).RunSynchronously();
+            db.SaveChanges();
+        }
+        public Order Add(Order entity)
         {
             if (entity.Date == null)
                 entity.Date = DateTime.Now;
@@ -25,27 +32,33 @@ namespace OrderApi.Data
             return newOrder;
         }
 
-        void IRepository<Order>.Edit(Order entity)
+        public void EditAsync(Order entity)
         {
             db.Entry(entity).State = EntityState.Modified;
             db.SaveChanges();
         }
 
-        Order IRepository<Order>.Get(int id)
+        public Order Get(int id)
         {
             return db.Orders.FirstOrDefault(o => o.Id == id);
         }
 
-        IEnumerable<Order> IRepository<Order>.GetAll()
+        public IEnumerable<Order> GetAll()
         {
             return db.Orders.ToList();
         }
 
-        void IRepository<Order>.Remove(int id)
+        public void Remove(int id)
         {
             var order = db.Orders.FirstOrDefault(p => p.Id == id);
             db.Orders.Remove(order);
             db.SaveChanges();
         }
+        public void ChangeStatus(OrderStatus status, int orderId)
+        {
+            db.Orders.FirstOrDefault(x => x.Id == orderId).Status = status;
+            db.SaveChanges();
+        }
+
     }
 }

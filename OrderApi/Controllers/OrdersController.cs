@@ -11,10 +11,11 @@ namespace OrderApi.Controllers
     public class OrdersController : Controller
     {
         private readonly IRepository<Order> repository;
-
-        public OrdersController(IRepository<Order> repos)
+        private readonly IRepository<Customer> customers;
+        public OrdersController(IRepository<Order> repos,IRepository<Customer> customers)
         {
             repository = repos;
+            this.customers = customers;
         }
 
         // GET: api/orders
@@ -23,12 +24,12 @@ namespace OrderApi.Controllers
         {
             return repository.GetAll();
         }
-
         // GET api/products/5
         [HttpGet("{id}", Name = "GetOrder")]
         public IActionResult Get(int id)
         {
             var item = repository.Get(id);
+            
             if (item == null)
             {
                 return NotFound();
@@ -44,7 +45,10 @@ namespace OrderApi.Controllers
             {
                 return BadRequest();
             }
-
+            var customer = customers.Get(order.CustomerId);
+            if (customer == null) return NotFound("Customer not found");
+            if (customer.CreditStanding == CreditStanding.HORRIBLE || customer.CreditStanding == CreditStanding.BAD)
+                return BadRequest("Customer credit too low");
             // Call ProductApi to get the product ordered
             RestClient c = new RestClient();
             // You may need to change the port number in the BaseUrl below
@@ -65,11 +69,11 @@ namespace OrderApi.Controllers
 
                 if (updateResponse.IsSuccessful)
                 {
+                    order.Status = OrderStatus.SHIPPED;
                     var newOrder = repository.Add(order);
                     return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
                 }
             }
-
             // If the order could not be created, "return no content".
             return NoContent();
         }
