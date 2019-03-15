@@ -69,6 +69,7 @@ namespace OrderApi.Data
         public void SetOrderShip(int orderId)
         {
             SetOrderStatus(orderId, OrderStatus.SHIPPED);
+            db.SaveChanges();
         }
         private void SetOrderStatus(int orderId, OrderStatus status) => db.Orders.FirstOrDefault(x => x.Id == orderId).Status = status;
     }

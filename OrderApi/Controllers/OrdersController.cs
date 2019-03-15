@@ -53,7 +53,7 @@ namespace OrderApi.Controllers
             RestClient c = new RestClient();
             // You may need to change the port number in the BaseUrl below
             // before you can run the request.
-            c.BaseUrl = new Uri("https://localhost:5001/api/products/");
+            c.BaseUrl = new Uri("https://localhost:44311/api/products/");
             var request = new RestRequest(order.ProductId.ToString(), Method.GET);
             var response = c.Execute<Product>(request);
             var orderedProduct = response.Data;
@@ -74,22 +74,26 @@ namespace OrderApi.Controllers
                     return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
                 }
             }
+            else return BadRequest("Not enough items in stock");
             // If the order could not be created, "return no content".
             return NoContent();
         }
-        [HttpPut("/orders/{id}/changeOrderStatus/cancel")]
+        [HttpPut("{id}/changeOrderStatus/cancel")]
         public IActionResult CancelOrder(int id)
         {
             orderRepo.SetOrderCancelled(id);
             return Ok();
         }
-        [HttpPut("orders/{id}/changeOrderStatus/pay")]
+        [HttpPut("{id}/changeOrderStatus/pay")]
         public IActionResult Pay(int id)
         {
+            var order = orderRepo.Get(id);
+            if (order == null)
+                return new NotFoundObjectResult("couldn't find order with id : " + id);
             orderRepo.SetOrderPaid(id);
-            return Ok();
+            return new ObjectResult(orderRepo.Get(id));
         }
-        [HttpPut("orders/{id}/changeOrderStatus/ship")]
+        [HttpPut("{id}/changeOrderStatus/ship")]
         public IActionResult Ship(int id)
         {
             orderRepo.SetOrderShip(id);

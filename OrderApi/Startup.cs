@@ -32,8 +32,6 @@ namespace OrderApi
             // Register database initializer for dependency injection
 
             services.AddTransient<IDbInitializer, DbInitializer>();
-//            services.AddSingleton<IHostedService, UpdateCreditStandingJob>();
-//            services.AddSingleton<IHostedService, UpdateUnpaidBills>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

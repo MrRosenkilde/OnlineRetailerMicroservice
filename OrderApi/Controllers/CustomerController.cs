@@ -12,9 +12,11 @@ namespace OrderApi.Controllers
     public class CustomerController : Controller
     {
         private readonly IRepository<Customer> customers;
-        public CustomerController(IRepository<Customer> customers)
+        private readonly IOrderRepository<Order> orders;
+        public CustomerController(IRepository<Customer> customers,IOrderRepository<Order> orders)
         {
             this.customers = customers;
+            this.orders = orders;
         }
         [HttpGet]
         public IActionResult Get() => new ObjectResult ( customers.GetAll() );
@@ -24,6 +26,12 @@ namespace OrderApi.Controllers
             var customer = customers.Get(id);
             if (customer == null) return NotFound();
             else return new ObjectResult(customer);
+        }
+        [HttpGet("{id}/orders")]
+        public IActionResult GetOrders(int Id)
+        {
+            var customerOrders = orders.Search(x => x.CustomerId == Id);
+            return new ObjectResult(customerOrders);
         }
         [HttpPost()]
         public IActionResult Post([FromBody]Customer c) {

@@ -38,6 +38,7 @@ namespace OrderApi.Data
         {
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
+
             List<Customer> customers = new List<Customer>
             {
                 new Customer
@@ -61,7 +62,7 @@ namespace OrderApi.Data
                 },
             };
             context.Customers.AddRange(customers);
-
+            context.SaveChanges();
         }
     }
 }
