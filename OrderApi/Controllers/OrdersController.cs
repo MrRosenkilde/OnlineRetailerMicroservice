@@ -10,26 +10,26 @@ namespace OrderApi.Controllers
     [Route("api/Orders")]
     public class OrdersController : Controller
     {
-        private readonly IRepository<Order> repository;
+        private readonly IOrderRepository<Order> orderRepo;
         private readonly IRepository<Customer> customers;
-        public OrdersController(IRepository<Order> repos,IRepository<Customer> customers)
+        public OrdersController(IOrderRepository<Order> repos, IRepository<Customer> customers)
         {
-            repository = repos;
+            orderRepo = repos;
             this.customers = customers;
         }
 
         // GET: api/orders
         [HttpGet]
-        public IEnumerable<Order> Get()
+        public IActionResult Get()
         {
-            return repository.GetAll();
+            return new ObjectResult(orderRepo.GetAll());
         }
-        // GET api/products/5
+        // GET api/Order/
         [HttpGet("{id}", Name = "GetOrder")]
         public IActionResult Get(int id)
         {
-            var item = repository.Get(id);
-            
+            var item = orderRepo.Get(id);
+
             if (item == null)
             {
                 return NotFound();
@@ -70,12 +70,30 @@ namespace OrderApi.Controllers
                 if (updateResponse.IsSuccessful)
                 {
                     order.Status = OrderStatus.SHIPPED;
-                    var newOrder = repository.Add(order);
+                    var newOrder = orderRepo.Add(order);
                     return CreatedAtRoute("GetOrder", new { id = newOrder.Id }, newOrder);
                 }
             }
             // If the order could not be created, "return no content".
             return NoContent();
+        }
+        [HttpPut("/orders/{id}/changeOrderStatus/cancel")]
+        public IActionResult CancelOrder(int id)
+        {
+            orderRepo.SetOrderCancelled(id);
+            return Ok();
+        }
+        [HttpPut("orders/{id}/changeOrderStatus/pay")]
+        public IActionResult Pay(int id)
+        {
+            orderRepo.SetOrderPaid(id);
+            return Ok();
+        }
+        [HttpPut("orders/{id}/changeOrderStatus/ship")]
+        public IActionResult Ship(int id)
+        {
+            orderRepo.SetOrderShip(id);
+            return Ok();
         }
 
     }

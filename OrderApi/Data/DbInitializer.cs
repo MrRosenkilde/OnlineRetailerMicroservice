@@ -21,7 +21,12 @@ namespace OrderApi.Data
 
             List<Order> orders = new List<Order>
             {
-                new Order { Date = DateTime.Today, ProductId = 1, Quantity = 2,CustomerId=0 }
+                new Order {
+                    Date = DateTime.Today,
+                    ProductId = 1,
+                    Quantity = 2,
+                    CustomerId =0
+                }
             };
 
             

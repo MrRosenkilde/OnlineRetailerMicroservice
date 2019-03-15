@@ -28,7 +28,7 @@ namespace OrderApi
         private Task Job()
         {
             foreach (Customer c in Customers.GetAll())
-                if (Orders.Search(x => x.CustomerId == c.Id).Select(x => x.Status == OrderStatus.UNPAID).Any())
+                if (Orders.Search(x => x.CustomerId == c.Id).Select(x => x.Status == OrderStatus.SHIPPED).Any())
                     c.CreditStanding = CreditStanding.HORRIBLE;
             return Task.CompletedTask;
         }

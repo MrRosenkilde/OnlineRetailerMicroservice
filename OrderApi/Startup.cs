@@ -27,13 +27,13 @@ namespace OrderApi
             services.AddDbContext<OrderApiContext>(opt => opt.UseInMemoryDatabase("OrdersDb"));
             services.AddDbContext<CustomerAPIContext>(opt => opt.UseInMemoryDatabase("CustomersDB"));
             // Register repositories for dependency injection
-            services.AddScoped<IRepository<Order>, OrderRepository>();
+            services.AddScoped<IOrderRepository<Order>, OrderRepository>();
             services.AddScoped<IRepository<Customer>, CustomerRepository>();
             // Register database initializer for dependency injection
 
             services.AddTransient<IDbInitializer, DbInitializer>();
-            services.AddSingleton<IHostedService, UpdateCreditStandingJob>();
-            services.AddSingleton<IHostedService, UpdateUnpaidBills>();
+//            services.AddSingleton<IHostedService, UpdateCreditStandingJob>();
+//            services.AddSingleton<IHostedService, UpdateUnpaidBills>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

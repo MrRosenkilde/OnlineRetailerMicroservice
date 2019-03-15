@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace OrderApi.Data
 {
-    public class OrderRepository : IRepository<Order>
+    public class OrderRepository : IOrderRepository<Order>
     {
         private readonly OrderApiContext db;
 
@@ -54,11 +54,22 @@ namespace OrderApi.Data
             db.Orders.Remove(order);
             db.SaveChanges();
         }
-        public void ChangeStatus(OrderStatus status, int orderId)
+        public void SetOrderPaid(int orderId)
         {
-            db.Orders.FirstOrDefault(x => x.Id == orderId).Status = status;
+            SetOrderStatus(orderId, OrderStatus.PAID);
             db.SaveChanges();
         }
 
+        public void SetOrderCancelled(int orderId)
+        {
+            SetOrderStatus(orderId, OrderStatus.CANCELLED);
+            db.SaveChanges();
+        }
+
+        public void SetOrderShip(int orderId)
+        {
+            SetOrderStatus(orderId, OrderStatus.SHIPPED);
+        }
+        private void SetOrderStatus(int orderId, OrderStatus status) => db.Orders.FirstOrDefault(x => x.Id == orderId).Status = status;
     }
 }

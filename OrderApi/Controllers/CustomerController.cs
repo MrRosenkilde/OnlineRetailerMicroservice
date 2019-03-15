@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OrderApi.Controllers
 { 
-    [Route("{controller}")]
+    [Route("/api/customers")]
     public class CustomerController : Controller
     {
         private readonly IRepository<Customer> customers;
@@ -26,7 +26,7 @@ namespace OrderApi.Controllers
             else return new ObjectResult(customer);
         }
         [HttpPost()]
-        public IActionResult Post(Customer c) {
+        public IActionResult Post([FromBody]Customer c) {
             var customer = customers.Get(c.Id);
             if (customer == null) {
                 customers.Add(c);
@@ -36,7 +36,7 @@ namespace OrderApi.Controllers
             return Ok();
         }
         [HttpDelete]
-        public IActionResult Delete(Customer c) {
+        public IActionResult Delete([FromBody]Customer c) {
             var customer = customers.Get(c.Id);
             if (c == null)
                 return BadRequest();
